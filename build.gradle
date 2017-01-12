@@ -1,0 +1,26 @@
+group 'com.martinbechtle'
+version '1.0.0'
+
+apply plugin: 'java'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+def springVersion = '1.4.3.RELEASE'
+
+dependencies {
+    compile 'com.github.MartinBechtle:JRequire:0.9'
+    compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.1-api', version: '1.0.0.Final'
+
+    testRuntime group: 'com.h2database', name: 'h2', version: '1.4.193'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springVersion
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: springVersion
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springVersion
+    testCompile 'javax.inject:javax.inject:1'
+}
