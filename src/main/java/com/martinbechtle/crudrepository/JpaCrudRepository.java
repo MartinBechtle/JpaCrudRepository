@@ -5,7 +5,6 @@ import com.martinbechtle.jrequire.Require;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
@@ -24,23 +23,11 @@ public class JpaCrudRepository<T, I extends Serializable> {
     private final EntityManager entityManager;
     private final Class<T> clazz;
 
-    private final TypedQuery<T> findAllQuery;
-    private final Query deleteAllQuery;
-
     @SuppressWarnings("unchecked")
     public JpaCrudRepository(EntityManager entityManager, Class<T> entityClass) {
 
         this.entityManager = entityManager;
         this.clazz = entityClass;
-
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<T> cq = criteriaBuilder.createQuery(clazz);
-        findAllQuery = entityManager.createQuery(
-                cq.select(cq.from(clazz)));
-
-        CriteriaDelete<T> delete = criteriaBuilder.createCriteriaDelete(clazz);
-        delete.from(clazz);
-        deleteAllQuery = entityManager.createQuery(delete);
     }
 
     /**
@@ -141,7 +128,13 @@ public class JpaCrudRepository<T, I extends Serializable> {
      */
     public List<T> findAll() {
 
-        return findAllQuery.getResultList();
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<T> criteriaQuery = criteriaBuilder.createQuery(clazz);
+        criteriaQuery.select(criteriaQuery.from(clazz));
+
+        return entityManager
+                .createQuery(criteriaQuery)
+                .getResultList();
     }
 
     /**
@@ -175,6 +168,12 @@ public class JpaCrudRepository<T, I extends Serializable> {
      */
     public void deleteAll() {
 
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+
+        CriteriaDelete<T> delete = criteriaBuilder.createCriteriaDelete(clazz);
+        delete.from(clazz);
+
+        Query deleteAllQuery = entityManager.createQuery(delete);
         deleteAllQuery.executeUpdate();
     }
 
